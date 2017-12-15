@@ -204,7 +204,7 @@ public class Algorithms
         return finalHull.Select(x => mapping[x]).ToList();
     }
 
-    static List<int> Shuffle(List<GameObject> list)
+    public static List<int> Shuffle(List<GameObject> list)
     {
         System.Random rng = new System.Random();
         List<int> idxList = new List<int>();
