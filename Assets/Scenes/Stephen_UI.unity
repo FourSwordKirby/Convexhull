@@ -378,6 +378,16 @@ Prefab:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: 224564337645733022, guid: 81f6dde4f07de694f8408726e657aa7b,
+        type: 2}
+      propertyPath: m_LocalPosition.x
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 224564337645733022, guid: 81f6dde4f07de694f8408726e657aa7b,
+        type: 2}
+      propertyPath: m_LocalPosition.y
+      value: -5
+      objectReference: {fileID: 0}
     - target: {fileID: 224572205018244814, guid: 81f6dde4f07de694f8408726e657aa7b,
         type: 2}
       propertyPath: m_LocalPosition.x
