@@ -25,13 +25,16 @@ public class StephenSceneScript : MonoBehaviour {
     // Use this for initialization
     void Start () {
         PointsControllerRef = GameObject.FindObjectOfType<PointsController>();
+        OutputH = 3;
 	}
 
     public int Stage = 0;
+    public int OutputH;
     public List<Vector2> Points;
     public OutputSensitiveConvexHull Alg;
     public int LastIndex;
     public List<int> TangentIndices;
+    public bool IsDone = false;
 
     // Update is called once per frame
     void Update () {
@@ -42,9 +45,18 @@ public class StephenSceneScript : MonoBehaviour {
             switch(Stage)
             {
                 case 0:
+                    PointsControllerRef.ClearAllShapes();
+                    foreach (Point p in PointsControllerRef.SpawnedPoints)
+                    {
+                        p.SetColor(Color.black);
+                        p.transform.localScale = new Vector3(1, 1, 1);
+                    }
+
                     Points = PointsControllerRef.SpawnedPoints.Select(p => (Vector2)p.transform.position).ToList();
                     Alg = new OutputSensitiveConvexHull(Points);
-                    Alg.CreateSubproblems(3);
+
+                    Debug.Log("Current H is: " + OutputH);
+                    Alg.CreateSubproblems(OutputH);
                     for (int subproblemIndex = 0; subproblemIndex < Alg.SubproblemPointsIndices.Count; ++subproblemIndex)
                     {
                         List<int> subproblem = Alg.SubproblemPointsIndices[subproblemIndex];
@@ -86,18 +98,40 @@ public class StephenSceneScript : MonoBehaviour {
                     break;
 
                 case 3:
-                    Alg.StepWalk();
+                    List<Vector2> line;
+                    bool ret = Alg.StepWalk();
+                    if (ret)
+                    {
+                        IsDone = true;
+
+                        line = new List<Vector2>() { PointsControllerRef.SpawnedPoints[LastIndex].transform.position,
+                                                               PointsControllerRef.SpawnedPoints[Alg.CurrentPointIndex].transform.position };
+                        PointsControllerRef.DrawShape(line, 0.3f, Color.black);
+
+                        ++Stage;
+                        break;
+                    }
+
+                    if (Alg.HullIndex >= OutputH + 1)
+                    {
+                        Debug.Log("No convex hull for current size.");
+                        OutputH *= OutputH;
+                        Stage = 0;
+                        break;
+                    }
+
                     foreach (int index in Alg.TangentIndices)
                     {
                         PointsControllerRef.SpawnedPoints[index].transform.localScale *= 2;
                         PointsControllerRef.SpawnedPoints[index].SetColor(Color.red);
                     }
                     PointsControllerRef.SpawnedPoints[Alg.CurrentPointIndex].SetColor(Color.blue);
-                    List<Vector2> line = new List<Vector2>() { PointsControllerRef.SpawnedPoints[LastIndex].transform.position,
+                    line = new List<Vector2>() { PointsControllerRef.SpawnedPoints[LastIndex].transform.position,
                                                                PointsControllerRef.SpawnedPoints[Alg.CurrentPointIndex].transform.position };
                     PointsControllerRef.DrawShape(line, 0.3f, Color.black);
 
                     LastIndex = Alg.CurrentPointIndex;
+
 
                     break;
 

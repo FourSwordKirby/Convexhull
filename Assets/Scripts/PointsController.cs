@@ -25,6 +25,7 @@ public class PointsController : MonoBehaviour {
     {
         PointsContainer = transform.Find("Points Container").gameObject;
         ShapesContainer = transform.Find("Shapes Container").gameObject;
+        SpawnedPoints.AddRange(ShapesContainer.transform.GetComponentsInChildren<Point>());
     }
 
     // Use this for initialization

@@ -112,8 +112,10 @@ MonoBehaviour:
   IsRecordingMouseClicks: 0
   SpawnedPoints: []
   InputPointColor: {r: 0, g: 0, b: 0, a: 1}
-  ShapeOutlineMaterial: {fileID: 0}
-  ShapeOutlineWidth: 0.1
+  ShapeOutlineMaterial: {fileID: 2100000, guid: eaecc8a8eb654b943b6749ec7fcebe22,
+    type: 2}
+  DefaultShapeOutlineColor: {r: 1, g: 0, b: 0, a: 1}
+  DefaultShapeOutlineWidth: 0.1
   PointPrefab: {fileID: 114963214873714586, guid: 5f9e098c23143ea4eb4853b7f6600a52,
     type: 2}
   ModelPrefabs:
