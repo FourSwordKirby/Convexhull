@@ -1,19 +1,26 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class MainUI : MonoBehaviour {
 
     public PointsController PointsControllerRef;
 
+    private RectTransform ControlPanel;
+    private Text SpawnedPointsText;
+
 	// Use this for initialization
 	void Start () {
         PointsControllerRef = GameObject.FindObjectOfType<PointsController>();
+
+        ControlPanel = transform.Find("Control Panel").GetComponent<RectTransform>();
+        SpawnedPointsText = ControlPanel.Find("Spawned Points Text").GetComponent<Text>();
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		
+        SpawnedPointsText.text = "Spawned Points: " + PointsControllerRef.SpawnedPoints.Count;
 	}
 
     public void SetRecordingMouseClick(bool b)
