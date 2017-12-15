@@ -212,7 +212,7 @@ public class Algorithms
         return finalHull.Select(x => mapping[x]).ToList();
     }
 
-    static List<int> Shuffle(List<Vector2> list)
+    public static List<int> Shuffle(List<Vector2> list)
     {
         System.Random rng = new System.Random();
         List<int> idxList = new List<int>();
