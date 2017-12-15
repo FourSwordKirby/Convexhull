@@ -26,10 +26,10 @@ public class Controller : MonoBehaviour {
             points.Add(p);
         }
 
-        List<GameObject> hull = Algorithms.ConvexHullBasic(points);
+        List<int> hull = Algorithms.ConvexHullBasic(points);
         print(hull.Count);
 
-        foreach (GameObject p in hull)
+        foreach (GameObject p in hull.Select(x => points[x]))
         {
             p.GetComponent<Point>().DisplayColor = Color.red;
             p.GetComponent<SpriteRenderer>().sortingOrder = 10;
