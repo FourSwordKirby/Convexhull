@@ -26,7 +26,12 @@ public class Controller : MonoBehaviour {
             points.Add(p);
         }
 
+        System.Diagnostics.Stopwatch Watch = new System.Diagnostics.Stopwatch();
+        Watch.Start();
         List<int> hull = Algorithms.ConvexHullBasic(points);
+        Watch.Stop();
+        Debug.Log("Search completed in: " + (Watch.ElapsedMilliseconds / 1000f) + " sec");
+
         print(hull.Count);
 
         foreach (GameObject p in hull.Select(x => points[x]))
