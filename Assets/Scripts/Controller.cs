@@ -26,15 +26,13 @@ public class Controller : MonoBehaviour {
             points.Add(p);
         }
 
-        List<Vector2> hull = Algorithms.ConvexHullBasic(points);
+        List<GameObject> hull = Algorithms.ConvexHullBasic(points);
         print(hull.Count);
 
-        for (int i = 0; i < hull.Count; i++)
+        foreach (GameObject p in hull)
         {
-            GameObject p = Instantiate(point);
-
-            p.transform.position = hull[i];
             p.GetComponent<Point>().DisplayColor = Color.red;
+            p.GetComponent<SpriteRenderer>().sortingOrder = 10;
         }
     }
 }

@@ -5,16 +5,16 @@ using UnityEngine;
 
 public class Algorithms
 {
-    public static List<Vector2> ConvexHullBasic(List<GameObject> p)
+    public static List<GameObject> ConvexHullBasic(List<GameObject> p)
     {
         Shuffle(p);
-        Dictionary<Vector2, Point> testBed = new Dictionary<Vector2, Point>();
+        Dictionary<Vector2, GameObject> mapping = new Dictionary<Vector2, GameObject>();
 
         //Copy the list
         List<Vector2> points = p.Select(x => (Vector2)x.transform.position).ToList();
         foreach (GameObject g in p)
         {
-            testBed.Add((Vector2)g.transform.position, g.GetComponent<Point>());
+            mapping.Add((Vector2)g.transform.position, g);
         }
 
         List<Vector2> triangle;
@@ -61,11 +61,11 @@ public class Algorithms
         {
             if (candidateEdgeMap[candidate] == null)
             {
-                testBed[candidate].DisplayColor = Color.black;
+                mapping[candidate].GetComponent<Point>().DisplayColor = Color.black;
                 continue;
             }
 
-            testBed[candidate].DisplayColor = Color.cyan;
+            mapping[candidate].GetComponent<Point>().DisplayColor = Color.cyan;
 
             //BuildTent Code
             Vertex c = new Vertex(candidate);
@@ -106,7 +106,7 @@ public class Algorithms
                     buckets[c].Add(r);
                     candidateEdgeMap[r] = c;
                 }
-                else if(!intersect1)
+                else if(!intersect1 && !intersect2)
                 {
                     candidateEdgeMap[r] = null;
                 }
@@ -196,15 +196,11 @@ public class Algorithms
         int count = 0;
         while (tracer.next != hullVertex)
         {
-            if (count > 10)
-                break;
-            count++;
             tracer = tracer.next;
-            Debug.Log(tracer.position);
             finalHull.Add(tracer.position);
         }
 
-        return finalHull;
+        return finalHull.Select(x => mapping[x]).ToList();
     }
 
     static void Shuffle<GameObject>(IList<GameObject> list)
