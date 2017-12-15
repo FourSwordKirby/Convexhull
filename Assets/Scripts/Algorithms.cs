@@ -5,16 +5,18 @@ using UnityEngine;
 
 public class Algorithms
 {
-    public static List<GameObject> ConvexHullBasic(List<GameObject> p)
+    public static List<int> ConvexHullBasic(List<GameObject> p)
     {
-        Shuffle(p);
-        Dictionary<Vector2, GameObject> mapping = new Dictionary<Vector2, GameObject>();
+        List<GameObject> copy = p.Select(x => x).ToList();
+
+        List <int> shuffledIdx = Shuffle(copy);
+        Dictionary<Vector2, int> mapping = new Dictionary<Vector2, int>();
 
         //Copy the list
-        List<Vector2> points = p.Select(x => (Vector2)x.transform.position).ToList();
-        foreach (GameObject g in p)
+        List<Vector2> points = copy.Select(x => (Vector2)x.transform.position).ToList();
+        for (int i = 0; i < points.Count; i++)
         {
-            mapping.Add((Vector2)g.transform.position, g);
+            mapping.Add(points[i], shuffledIdx[i]);
         }
 
         List<Vector2> triangle;
@@ -61,11 +63,11 @@ public class Algorithms
         {
             if (candidateEdgeMap[candidate] == null)
             {
-                mapping[candidate].GetComponent<Point>().DisplayColor = Color.black;
+                //mapping[candidate].GetComponent<Point>().DisplayColor = Color.black;
                 continue;
             }
 
-            mapping[candidate].GetComponent<Point>().DisplayColor = Color.cyan;
+            //mapping[candidate].GetComponent<Point>().DisplayColor = Color.cyan;
 
             //BuildTent Code
             Vertex c = new Vertex(candidate);
@@ -193,7 +195,6 @@ public class Algorithms
         Vertex tracer = hullVertex;
         finalHull.Add(tracer.position);
 
-        int count = 0;
         while (tracer.next != hullVertex)
         {
             tracer = tracer.next;
@@ -203,10 +204,17 @@ public class Algorithms
         return finalHull.Select(x => mapping[x]).ToList();
     }
 
-    static void Shuffle<GameObject>(IList<GameObject> list)
+    static List<int> Shuffle(List<GameObject> list)
     {
         System.Random rng = new System.Random();
+        List<int> idxList = new List<int>();
+
         int n = list.Count;
+        for(int i = 0; i < n; i++)
+        {
+            idxList.Add(i);
+        }
+
         while (n > 1)
         {
             n--;
@@ -214,8 +222,14 @@ public class Algorithms
             GameObject value = list[k];
             list[k] = list[n];
             list[n] = value;
+
+            int idx = idxList[k];
+            idxList[k] = idxList[n];
+            idxList[n] = idx;
         }
+        return idxList;
     }
+
     //We could replace this with a faster intersection test http://www.stefanbader.ch/faster-line-segment-intersection-for-unity3dc/
     public static bool Intersects(Vector2 p11, Vector2 p12,
                                     Vector2 p21, Vector2 p22)
