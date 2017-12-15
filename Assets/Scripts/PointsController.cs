@@ -11,7 +11,8 @@ public class PointsController : MonoBehaviour {
     public List<Point> SpawnedPoints = new List<Point>();
     public Color InputPointColor = Color.black;
     public Material ShapeOutlineMaterial;
-    public float ShapeOutlineWidth = 0.1f;
+    public Color DefaultShapeOutlineColor = Color.red;
+    public float DefaultShapeOutlineWidth = 0.1f;
 
     public Point PointPrefab;
     public List<Model> ModelPrefabs = new List<Model>();
@@ -72,7 +73,7 @@ public class PointsController : MonoBehaviour {
     /// <summary>
     /// Will draw a shape in order of points, closing the shape.
     /// </summary>
-    public LineRenderer DrawShape(List<Vector3> points)
+    public LineRenderer DrawShape(List<Vector2> points, float width, Color color)
     {
         GameObject obj = new GameObject("Shape");
         obj.transform.SetParent(ShapesContainer.transform);
@@ -86,15 +87,17 @@ public class PointsController : MonoBehaviour {
         lr.loop = true;
 
         lr.material = ShapeOutlineMaterial;
-        lr.startWidth = ShapeOutlineWidth;
-        lr.endWidth = ShapeOutlineWidth;
+        lr.startColor = color;
+        lr.endColor = color;
+        lr.startWidth = width;
+        lr.endWidth = width;
         
         return lr;
     }
 
     public void DrawShapeForLayer(int layerIndex)
     {
-        DrawShape(SpawnedPoints.Select(p => p.transform.position).ToList());
+        DrawShape(SpawnedPoints.Select(p => (Vector2)p.transform.position).ToList(), DefaultShapeOutlineWidth, DefaultShapeOutlineColor);
     }
 
     public void SpawnPointsForModel(int modelIndex)
@@ -102,6 +105,14 @@ public class PointsController : MonoBehaviour {
         Debug.Log("Spawning points for model " + modelIndex);
         Model m = Instantiate<Model>(ModelPrefabs[modelIndex], transform);
         StartCoroutine(SpawnPointsCoroutine(m));
+    }
+
+    public void ClearAllShapes()
+    {
+        foreach (Transform child in ShapesContainer.transform)
+        {
+            Destroy(child.gameObject);
+        }
     }
 
     private IEnumerator SpawnPointsCoroutine(Model m)
