@@ -1,0 +1,347 @@
+fileFormatVersion: 2
+guid: ba0ac68d050abc84581212fb3e19c688
+timeCreated: 1513300348
+licenseType: Free
+ModelImporter:
+  serializedVersion: 22
+  fileIDToRecycleName:
+    100000: PlaneAxis_mesh
+    100002: PlaneBody_mesh
+    100004: PlaneEngine_mesh
+    100006: PlaneExL1_mesh
+    100008: PlaneExL2_mesh
+    100010: PlaneExL3_mesh
+    100012: PlaneExR1_mesh
+    100014: PlaneExR2_mesh
+    100016: PlaneExR3_mesh
+    100018: PlaneHubL_mesh
+    100020: PlaneHubR_mesh
+    100022: PlaneLandingL_mesh
+    100024: PlaneLandingR_mesh
+    100026: PlanePilot_mesh
+    100028: PlanePropeller_mesh
+    100030: PlanePropellerHub_mesh
+    100032: PlaneRigCenter_mesh
+    100034: PlaneRigL_mesh
+    100036: PlaneRigR_mesh
+    100038: PlaneTailL_mesh
+    100040: PlaneTailR_mesh
+    100042: PlaneWheelL_mesh
+    100044: PlaneWheelR_mesh
+    100046: PlaneWingBottomL_mesh
+    100048: PlaneWingBottomR_mesh
+    100050: PlaneWingTop_mesh
+    100052: //RootNode
+    400000: PlaneAxis_mesh
+    400002: PlaneBody_mesh
+    400004: PlaneEngine_mesh
+    400006: PlaneExL1_mesh
+    400008: PlaneExL2_mesh
+    400010: PlaneExL3_mesh
+    400012: PlaneExR1_mesh
+    400014: PlaneExR2_mesh
+    400016: PlaneExR3_mesh
+    400018: PlaneHubL_mesh
+    400020: PlaneHubR_mesh
+    400022: PlaneLandingL_mesh
+    400024: PlaneLandingR_mesh
+    400026: PlanePilot_mesh
+    400028: PlanePropeller_mesh
+    400030: PlanePropellerHub_mesh
+    400032: PlaneRigCenter_mesh
+    400034: PlaneRigL_mesh
+    400036: PlaneRigR_mesh
+    400038: PlaneTailL_mesh
+    400040: PlaneTailR_mesh
+    400042: PlaneWheelL_mesh
+    400044: PlaneWheelR_mesh
+    400046: PlaneWingBottomL_mesh
+    400048: PlaneWingBottomR_mesh
+    400050: PlaneWingTop_mesh
+    400052: //RootNode
+    2300000: PlaneAxis_mesh
+    2300002: PlaneBody_mesh
+    2300004: PlaneEngine_mesh
+    2300006: PlaneExL1_mesh
+    2300008: PlaneExL2_mesh
+    2300010: PlaneExL3_mesh
+    2300012: PlaneExR1_mesh
+    2300014: PlaneExR2_mesh
+    2300016: PlaneExR3_mesh
+    2300018: PlaneHubL_mesh
+    2300020: PlaneHubR_mesh
+    2300022: PlaneLandingL_mesh
+    2300024: PlaneLandingR_mesh
+    2300026: PlanePilot_mesh
+    2300028: PlanePropeller_mesh
+    2300030: PlanePropellerHub_mesh
+    2300032: PlaneRigCenter_mesh
+    2300034: PlaneRigL_mesh
+    2300036: PlaneRigR_mesh
+    2300038: PlaneTailL_mesh
+    2300040: PlaneTailR_mesh
+    2300042: PlaneWheelL_mesh
+    2300044: PlaneWheelR_mesh
+    2300046: PlaneWingBottomL_mesh
+    2300048: PlaneWingBottomR_mesh
+    2300050: PlaneWingTop_mesh
+    3300000: PlaneAxis_mesh
+    3300002: PlaneBody_mesh
+    3300004: PlaneEngine_mesh
+    3300006: PlaneExL1_mesh
+    3300008: PlaneExL2_mesh
+    3300010: PlaneExL3_mesh
+    3300012: PlaneExR1_mesh
+    3300014: PlaneExR2_mesh
+    3300016: PlaneExR3_mesh
+    3300018: PlaneHubL_mesh
+    3300020: PlaneHubR_mesh
+    3300022: PlaneLandingL_mesh
+    3300024: PlaneLandingR_mesh
+    3300026: PlanePilot_mesh
+    3300028: PlanePropeller_mesh
+    3300030: PlanePropellerHub_mesh
+    3300032: PlaneRigCenter_mesh
+    3300034: PlaneRigL_mesh
+    3300036: PlaneRigR_mesh
+    3300038: PlaneTailL_mesh
+    3300040: PlaneTailR_mesh
+    3300042: PlaneWheelL_mesh
+    3300044: PlaneWheelR_mesh
+    3300046: PlaneWingBottomL_mesh
+    3300048: PlaneWingBottomR_mesh
+    3300050: PlaneWingTop_mesh
+    4300000: PlaneAxis_mesh
+    4300002: PlaneBody_mesh
+    4300004: PlaneEngine_mesh
+    4300006: PlaneExL1_mesh
+    4300008: PlaneExL2_mesh
+    4300010: PlaneExL3_mesh
+    4300012: PlaneExR1_mesh
+    4300014: PlaneExR2_mesh
+    4300016: PlaneExR3_mesh
+    4300018: PlaneHubL_mesh
+    4300020: PlaneHubR_mesh
+    4300022: PlaneLandingL_mesh
+    4300024: PlaneLandingR_mesh
+    4300026: PlanePilot_mesh
+    4300028: PlanePropeller_mesh
+    4300030: PlanePropellerHub_mesh
+    4300032: PlaneRigCenter_mesh
+    4300034: PlaneRigL_mesh
+    4300036: PlaneRigR_mesh
+    4300038: PlaneTailL_mesh
+    4300040: PlaneTailR_mesh
+    4300042: PlaneWheelL_mesh
+    4300044: PlaneWheelR_mesh
+    4300046: PlaneWingBottomL_mesh
+    4300048: PlaneWingBottomR_mesh
+    4300050: PlaneWingTop_mesh
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: PlaneAxis_meshMat
+    second: {fileID: 2100000, guid: 16b98d4f0c8138d40a2d640c8be47ac0, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: PlaneBody_meshMat
+    second: {fileID: 2100000, guid: f8c595d7ccb83ba448f7af9a13afded1, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: PlaneEngine_meshMat
+    second: {fileID: 2100000, guid: 79dcba37e36e3654d818b53ecef6ee18, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: PlaneExL1_meshMat
+    second: {fileID: 2100000, guid: b8d299e5645bf1346a799954de83ce05, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: PlaneExL2_meshMat
+    second: {fileID: 2100000, guid: 16e60ea66eadc154eaee96c33f8b80fb, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: PlaneExL3_meshMat
+    second: {fileID: 2100000, guid: 54cd2a00164565a4e98051d233e62481, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: PlaneExR1_meshMat
+    second: {fileID: 2100000, guid: b66c427a0c3077f41a828f68196878db, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: PlaneExR2_meshMat
+    second: {fileID: 2100000, guid: 6aac3fab8dceb194596009fc053bbea5, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: PlaneExR3_meshMat
+    second: {fileID: 2100000, guid: 6ddf91eaab9dd004787473f4c53b6c63, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: PlaneHubL_meshMat
+    second: {fileID: 2100000, guid: e57e36e4763a8d8409adb0bdb277d8dc, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: PlaneHubR_meshMat
+    second: {fileID: 2100000, guid: 4c686320a24ee144e8094582ba5c49cd, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: PlaneLandingL_meshMat
+    second: {fileID: 2100000, guid: 8dc29c9a17f4fd047b28c8127d28149a, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: PlaneLandingR_meshMat
+    second: {fileID: 2100000, guid: 2cc4a45d19288aa42bca3da8209be162, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: PlanePilot_meshMat
+    second: {fileID: 2100000, guid: 13c8a82360a02b84fbebbe75d8a04ddd, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: PlanePropellerHub_meshMat
+    second: {fileID: 2100000, guid: 1fcd241f02f91ad40b5d1382c2934b14, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: PlanePropeller_meshMat
+    second: {fileID: 2100000, guid: 4d17d38b26234444d8166e30b10a7c23, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: PlaneRigCenter_meshMat
+    second: {fileID: 2100000, guid: 213130dcbbe10b946888105df1d3f03b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: PlaneRigL_meshMat
+    second: {fileID: 2100000, guid: d8a32ab512d0c8b4bb4caef8f2660d51, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: PlaneRigR_meshMat
+    second: {fileID: 2100000, guid: 834f469d2768cb049982c2d715631279, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: PlaneTailL_meshMat
+    second: {fileID: 2100000, guid: 641a9f8462707004b99971c0da6a3c97, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: PlaneTailR_meshMat
+    second: {fileID: 2100000, guid: bec366104e44c304ca9d9de41fa9672b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: PlaneWheelL_meshMat
+    second: {fileID: 2100000, guid: 8ebce865b320f4747af73dac8dceda52, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: PlaneWheelR_meshMat
+    second: {fileID: 2100000, guid: 61b141c6cb69b1447ac5854dde3b4d84, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: PlaneWingBottomL_meshMat
+    second: {fileID: 2100000, guid: 1a4ce48d5dd16444aaae5a994f3ec2df, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: PlaneWingBottomR_meshMat
+    second: {fileID: 2100000, guid: 77a53f3a55a41cf4781489fd0b378a36, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: PlaneWingTop_meshMat
+    second: {fileID: 2100000, guid: a39a5c5cf95b5014a86d5ee59dbedbef, type: 2}
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 0
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 0
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
