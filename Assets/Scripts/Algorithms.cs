@@ -5,13 +5,24 @@ using UnityEngine;
 
 public class Algorithms
 {
-    public static void ConvexHullBasic(List<GameObject> p)
+    public static List<Vector2> ConvexHullBasic(List<GameObject> p)
     {
+        Shuffle(p);
+        Dictionary<Vector2, Point> testBed = new Dictionary<Vector2, Point>();
+
         //Copy the list
         List<Vector2> points = p.Select(x => (Vector2)x.transform.position).ToList();
-        Shuffle(points);
+        foreach (GameObject g in p)
+        {
+            testBed.Add((Vector2)g.transform.position, g.GetComponent<Point>());
+        }
 
-        Polygon hull = new Polygon(points.GetRange(0, 3));
+        List<Vector2> triangle;
+        if (isLeft(points[1], points[2], points[0]))
+            triangle = new List<Vector2>() { points[0], points[2], points[1] };
+        else
+            triangle = new List<Vector2>() { points[0], points[1], points[2] };
+        Polygon hull = new Polygon(triangle);
 
         Vector2 interiorPoint = hull.vertices.Select(x => x.position).Aggregate((x, y) => x + y);
         interiorPoint = interiorPoint / 3.0f;
@@ -22,7 +33,8 @@ public class Algorithms
         //center.GetComponent<SpriteRenderer>().color = Color.red;
 
         //Partitioning the remaining points by the side of the triangle they intersect
-        Dictionary<Vector2, Vertex> buckets = new Dictionary<Vector2, Vertex>();
+        Dictionary<Vertex, HashSet<Vector2>> buckets = new Dictionary<Vertex, HashSet<Vector2>>();
+        Dictionary<Vector2, Vertex> candidateEdgeMap = new Dictionary<Vector2, Vertex>();
 
         for (int i = 3; i < points.Count; i++)
         {
@@ -35,49 +47,164 @@ public class Algorithms
 
                 if (Intersects(candidatePoint, interiorPoint, p1, p2))
                 {
-                    buckets.Add(candidatePoint, v);
-
-                    //Checking that the line side test works
-                    /*
-                    if (p1 == hull[0])
-                        candidatePoint.GetComponent<SpriteRenderer>().color = Color.black;
-                    if (p1 == hull[1])
-                        candidatePoint.GetComponent<SpriteRenderer>().color = Color.cyan;
-                    if (p1 == hull[2])
-                        candidatePoint.GetComponent<SpriteRenderer>().color = Color.magenta;
-                    break;
-                    */
+                    if (!buckets.ContainsKey(v))
+                        buckets.Add(v, new HashSet<Vector2>());
+                    buckets[v].Add(candidatePoint);
+                    candidateEdgeMap.Add(candidatePoint, v);
                 }
             }
         }
 
-        /*
-        foreach(Vector2 candidate in buckets.Keys)
+        Vertex hullVertex = hull.vertices[0];
+        List<Vector2> candidates = candidateEdgeMap.Keys.Select(x => x).ToList();
+        foreach(Vector2 candidate in candidates)
         {
-            //BuildTent Code
-            Vector2 p = candidate;
-            Vertex p = new Vertex(p);
-            Vertex e = buckets[candidate];
+            if (candidateEdgeMap[candidate] == null)
+            {
+                testBed[candidate].DisplayColor = Color.black;
+                continue;
+            }
 
-            List<Vertex> visibleEdges = new List<Vertex>() { e };
-            Vertex next = e;
-            Vertex prev = e;
-            bool intersected = true;
+            testBed[candidate].DisplayColor = Color.cyan;
+
+            //BuildTent Code
+            Vertex c = new Vertex(candidate);
+            Vertex v = candidateEdgeMap[candidate];
+            Vertex next = v.next;
+            Vertex prev = v;
+            bool lineSide = true;
+
+            //Marking a starting point of our hull
+            hullVertex = c;
+
+            //Initial tent building
+            v.next = c;
+            c.prev = v;
+            c.next = next;
+            next.prev = c;
+
+
+
+            List<Vector2> initialReassignedPoints = buckets[v].Select(x => x).ToList();
+            foreach (Vector2 r in initialReassignedPoints)
+            {
+                if (r == c.position)
+                    continue;
+
+                bool intersect1 = Intersects(r, interiorPoint, v.position, c.position);
+                bool intersect2 = Intersects(r, interiorPoint, c.position, next.position);
+
+                if(!intersect1)
+                {
+                    buckets[v].Remove(r);
+                }
+
+                if (intersect2)
+                {
+                    if (!buckets.ContainsKey(c))
+                        buckets.Add(c, new HashSet<Vector2>());
+                    buckets[c].Add(r);
+                    candidateEdgeMap[r] = c;
+                }
+                else if(!intersect1)
+                {
+                    candidateEdgeMap[r] = null;
+                }
+            }
+
+            //Forward checks
             do
             {
-                Vertex next_prime = e.next;
-                intersected = Intersects(p, interiorPoint, next.position, next_prime.position);
-                if(intersected)
-                    next_p
-            } while (intersected);
+                Vertex next_prime = next.next;
+                lineSide = isLeft(next.position, next_prime.position, c.position);
+                if (lineSide)
+                {
+                    c.next = next_prime;
+                    next_prime.prev = c;
 
+                    if (buckets.ContainsKey(next))
+                    {
+                        List<Vector2> reassignedPoints = buckets[next].Select(x => x).ToList();
+                        //Reassigning things
+                        foreach (Vector2 r in reassignedPoints)
+                        {
+                            if (r == c.position)
+                                continue;
+                            buckets[next].Remove(r);
+
+                            bool intersect = Intersects(r, interiorPoint, c.position, next_prime.position);
+                            if (intersect)
+                            {
+                                if (!buckets.ContainsKey(c))
+                                    buckets.Add(c, new HashSet<Vector2>());
+                                buckets[c].Add(r);
+                                candidateEdgeMap[r] = c;
+                            }
+                            else
+                                candidateEdgeMap[r] = null;
+                        }
+                    }
+                }
+
+                next = next_prime;
+            } while (lineSide);
+
+            //Backwards checks
+            do
+            {
+                Vertex prev_prime = prev.prev;
+                lineSide = isLeft(prev_prime.position, prev.position, c.position);
+                if (lineSide)
+                {
+                    c.prev = prev_prime;
+                    prev_prime.next = c;
+
+                    if (buckets.ContainsKey(prev))
+                    {
+                        List<Vector2> reassignedPoints = buckets[prev].Select(x => x).ToList();
+                        //Reassigning things
+                        foreach (Vector2 r in reassignedPoints)
+                        {
+                            if (r == c.position)
+                                continue;
+                            buckets[prev].Remove(r);
+
+                            bool intersect = Intersects(r, interiorPoint, prev_prime.position, c.position);
+                            if (intersect)
+                            {
+                                if (!buckets.ContainsKey(prev_prime))
+                                    buckets.Add(prev_prime, new HashSet<Vector2>());
+                                buckets[prev_prime].Add(r);
+                                candidateEdgeMap[r] = prev_prime;
+                            }
+                            else
+                                candidateEdgeMap[r] = null;
+                        }
+                    }
+                }
+
+                prev = prev_prime;
+            } while (lineSide);
         }
-        */
 
-        //foreach (GameObject hp in hull)
-        //{
-        //    hp.GetComponent<SpriteRenderer>().color = Color.green;
-        //}
+
+        List<Vector2> finalHull = new List<Vector2>();
+
+        Vertex tracer = hullVertex;
+        finalHull.Add(tracer.position);
+
+        int count = 0;
+        while (tracer.next != hullVertex)
+        {
+            if (count > 10)
+                break;
+            count++;
+            tracer = tracer.next;
+            Debug.Log(tracer.position);
+            finalHull.Add(tracer.position);
+        }
+
+        return finalHull;
     }
 
     static void Shuffle<GameObject>(IList<GameObject> list)
@@ -115,6 +242,11 @@ public class Algorithms
 
         return solution[0] >= 0 && solution[1] >= 0 && solution[2] >= 0 && solution[3] >= 0;
     }
+
+    public static bool isLeft(Vector2 a, Vector2 b, Vector2 c)
+    {
+        return ((b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x)) >= 0.0f;
+    }
 }
 
 
@@ -122,6 +254,10 @@ public class Polygon
 {
     public List<Vertex> vertices { get; private set; }
 
+    /// <summary>
+    /// Polygon must be initially constructed in order
+    /// </summary>
+    /// <param name="points"></param>
     public Polygon(List<Vector2> points)
     {
         vertices = points.Select(x => new Vertex(x)).ToList();
@@ -134,6 +270,11 @@ public class Polygon
             vertices[i].prev = prev;
             vertices[i].next = next;
         }
+    }
+
+    public void AddVertex(Vertex v)
+    {
+        vertices.Add(v);
     }
 }
 

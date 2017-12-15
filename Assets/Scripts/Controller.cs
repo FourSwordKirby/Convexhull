@@ -16,19 +16,26 @@ public class Controller : MonoBehaviour {
         {
             GameObject p = Instantiate(point);
 
+            p.name = "Point" + i;
+
             float x = Random.Range(-10.0f, 10.0f);
             float y = Random.Range(-10.0f, 10.0f);
 
             p.transform.position = new Vector2(x, y);
+            p.transform.localScale = 3.0f * Vector3.one;
             points.Add(p);
         }
 
-        Algorithms.ConvexHullBasic(points);
-	}
-	
+        List<Vector2> hull = Algorithms.ConvexHullBasic(points);
+        print(hull.Count);
 
-    
+        for (int i = 0; i < hull.Count; i++)
+        {
+            GameObject p = Instantiate(point);
 
-
+            p.transform.position = hull[i];
+            p.GetComponent<Point>().DisplayColor = Color.red;
+        }
+    }
 }
 
