@@ -23,7 +23,7 @@ public class RandomIncrementalConvexHull
             triangle = new List<Vector2>() { points[0], points[2], points[1] };
         else
             triangle = new List<Vector2>() { points[0], points[1], points[2] };
-        Polygon hull = new Polygon(triangle);
+        hull = new Polygon(triangle);
 
         interiorPoint = hull.vertices.Select(x => x.position).Aggregate((x, y) => x + y);
         interiorPoint = interiorPoint / 3.0f;
@@ -66,15 +66,16 @@ public class RandomIncrementalConvexHull
             }
         }
     }
-
-    public void Step()
+    
+    public Vector2 Step()
     {
         Vector2 candidate = candidateEdgeMap.Keys.ElementAt(0);
 
         if (candidateEdgeMap[candidate] == null)
         {
             candidateEdgeMap.Remove(candidate);
-            return;
+            Debug.Log("Skipping candidate");
+            return candidate;
         }
 
         //mapping[candidate].GetComponent<Point>().DisplayColor = Color.cyan;
@@ -86,13 +87,20 @@ public class RandomIncrementalConvexHull
         Vertex prev = v;
         bool lineSide = true;
 
+        candidateEdgeMap.Remove(candidate);
+
+        if (!Algorithms.Intersects(c.position, interiorPoint, prev.position, next.position))
+        {
+            Debug.Log("Lingering candidate");
+            return candidate;
+        }
 
         //Initial tent building
         v.next = c;
         c.prev = v;
         c.next = next;
         next.prev = c;
-
+        hull.vertices.Add(c);
 
 
         List<Vector2> initialReassignedPoints = buckets[v].Select(x => x).ToList();
@@ -114,11 +122,17 @@ public class RandomIncrementalConvexHull
                 if (!buckets.ContainsKey(c))
                     buckets.Add(c, new HashSet<Vector2>());
                 buckets[c].Add(r);
-                candidateEdgeMap[r] = c;
+                if (candidateEdgeMap.ContainsKey(r))
+                {
+                    candidateEdgeMap[r] = c;
+                }
             }
             else if (!intersect1 && !intersect2)
             {
-                candidateEdgeMap[r] = null;
+                if (candidateEdgeMap.ContainsKey(r))
+                {
+                    candidateEdgeMap[r] = null;
+                }
             }
         }
 
@@ -148,15 +162,23 @@ public class RandomIncrementalConvexHull
                             if (!buckets.ContainsKey(c))
                                 buckets.Add(c, new HashSet<Vector2>());
                             buckets[c].Add(r);
-                            candidateEdgeMap[r] = c;
+                            if (candidateEdgeMap.ContainsKey(r))
+                            {
+                                candidateEdgeMap[r] = c;
+                            }
                         }
                         else
-                            candidateEdgeMap[r] = null;
+                        {
+                            if (candidateEdgeMap.ContainsKey(r))
+                            {
+                                candidateEdgeMap[r] = null;
+                            }
+                        }
                     }
                 }
+                hull.vertices.Remove(next);
             }
 
-            hull.vertices.Remove(next);
             next = next_prime;
         } while (lineSide);
 
@@ -186,16 +208,27 @@ public class RandomIncrementalConvexHull
                             if (!buckets.ContainsKey(prev_prime))
                                 buckets.Add(prev_prime, new HashSet<Vector2>());
                             buckets[prev_prime].Add(r);
-                            candidateEdgeMap[r] = prev_prime;
+
+                            if (candidateEdgeMap.ContainsKey(r))
+                            {
+                                candidateEdgeMap[r] = prev_prime;
+                            }
                         }
                         else
-                            candidateEdgeMap[r] = null;
+                        {
+                            if (candidateEdgeMap.ContainsKey(r))
+                            {
+                                candidateEdgeMap[r] = null;
+                            }
+                        }
                     }
                 }
+                hull.vertices.Remove(prev);
             }
 
-            hull.vertices.Remove(prev);
             prev = prev_prime;
         } while (lineSide);
+
+        return candidate;
     }
 }

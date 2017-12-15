@@ -7,11 +7,17 @@ public class OutputSensitiveConvexHull {
 
     public List<Vector2> InputPoints;
     public int LeftmostPointIndex;
-    
+
+    public float TotalTime;
+
     public OutputSensitiveConvexHull(List<Vector2> points)
     {
         InputPoints = new List<Vector2>(points);
+        ComputeLeftmostPoint();
+    }
 
+    public int ComputeLeftmostPoint()
+    {
         // Find and assign leftmost point in linear time.
         LeftmostPointIndex = 0;
         for (int i = 1; i < InputPoints.Count; ++i)
@@ -31,22 +37,32 @@ public class OutputSensitiveConvexHull {
                 }
             }
         }
+        return LeftmostPointIndex;
     }
     
     public List<int> ComputeConvexHullIndices()
     {
         Debug.Log("Computing output sensative convex hull on " + InputPoints.Count + " points");
 
-        int h = 3;
-        while (h < InputPoints.Count * InputPoints.Count)
+        System.Diagnostics.Stopwatch watch = new System.Diagnostics.Stopwatch();
+        watch.Start();
+
+        ComputeLeftmostPoint();
+        int restarts = 0;
+        int h = 39;
+        while (restarts <= 4)
         {
             List<int> result = ComputeConvexHullIndicesWithMaxSize(h);
             if (result != null)
             {
+                watch.Stop();
+                TotalTime = watch.ElapsedMilliseconds / 1000f;
+                Debug.Log("Restarts required: " + restarts);
                 return result;
             }
 
             h *= h;
+            ++restarts;
         }
 
         throw new System.Exception("Output sensative convex hull did not return for h > n.");
@@ -54,7 +70,6 @@ public class OutputSensitiveConvexHull {
 
     public int H;
     public List<List<int>> SubproblemPointsIndices;
-    public List<List<Vector2>> SubproblemPoints;
     public List<List<int>> IndiciesForSubhulls;
     public List<List<Vector2>> Subhulls;
     public List<int> CompleteHull;
@@ -71,40 +86,30 @@ public class OutputSensitiveConvexHull {
 
         int numSubproblems = ((InputPoints.Count - 1) / h) + 1;
         SubproblemPointsIndices = new List<List<int>>(numSubproblems);
-        SubproblemPoints = new List<List<Vector2>>(numSubproblems);
         Debug.Log("Expected number of subproblems: " + numSubproblems);
 
-        IEnumerable<Vector2> remainingPoints = InputPoints;
-        while (remainingPoints.Count() > 0)
+        for (int subproblemIndex = 0; subproblemIndex < numSubproblems; ++subproblemIndex)
         {
-            List<Vector2> subproblem = remainingPoints.Take(h).ToList();
-            SubproblemPoints.Add(subproblem);
-            SubproblemPointsIndices.Add(Enumerable.Range(SubproblemPointsIndices.Count * h, subproblem.Count).ToList());
-            remainingPoints = remainingPoints.Skip(h);
+            List<int> indicies = new List<int>(H);
+            for (int i = subproblemIndex * H;  i < Mathf.Min((subproblemIndex + 1) * H, InputPoints.Count); ++i)
+            {
+                indicies.Add(i);
+            }
+            
+            SubproblemPointsIndices.Add(indicies);
         }
     }
-
-    public bool HasFailedSubhull = false;
-    public int FailedSubhull = -1;
-
+    
     public void ComputeAllSubhulls()
     {
-        FailedSubhull = -1;
-        Debug.Log("Computing subhulls for " + SubproblemPoints.Count + " subproblems");
-        IndiciesForSubhulls = new List<List<int>>(SubproblemPoints.Count);
-        Subhulls = new List<List<Vector2>>(SubproblemPoints.Count);
-        for (int i = 0; i < SubproblemPoints.Count; ++i)
+        Debug.Log("Computing subhulls for " + SubproblemPointsIndices.Count + " subproblems");
+        IndiciesForSubhulls = new List<List<int>>(SubproblemPointsIndices.Count);
+        Subhulls = new List<List<Vector2>>(SubproblemPointsIndices.Count);
+        for (int i = 0; i < SubproblemPointsIndices.Count; ++i)
         {
-            Debug.Log("Computing subhull problem " + i);
-            List<int> subhullIndices = ComputeSubHullIndicies(SubproblemPoints[i]);
-
-            if(HasFailedSubhull)
-            {
-                FailedSubhull = i;
-                HasFailedSubhull = false;
-            }
-
-            List<Vector2> subhull = subhullIndices.Select(sIndex => SubproblemPoints[i][sIndex]).ToList();
+            List<Vector2> subproblem = SubproblemPointsIndices[i].Select(sIndex => InputPoints[sIndex]).ToList();
+            List<int> subhullIndices = ComputeSubHullIndicies(subproblem);
+            List<Vector2> subhull = subhullIndices.Select(sIndex => subproblem[sIndex]).ToList();
             IndiciesForSubhulls.Add(subhullIndices);
             Subhulls.Add(subhull);
         }
@@ -173,6 +178,7 @@ public class OutputSensitiveConvexHull {
             if(StepWalk())
             {
                 Debug.Log("Convex hull found with " + CompleteHull.Count + " points.");
+                CompleteHull.Reverse();
                 return CompleteHull;
             }
         }
@@ -204,69 +210,98 @@ public class OutputSensitiveConvexHull {
                 return 1;
             }
         }
-        
-        int n = (points.Count + 1) / 2;
-        int i = 0;
-        bool isForward = true;
-        int extraAttempts = -1;
-        while (true)
+
+
+        int n = points.Count;
+
+        if (points[0] == refPoint)
         {
-            int nextI = (i + 1) % points.Count;
-            int prevI = (i + points.Count - 1) % points.Count;
+            return n - 1;
+        }
 
-            Vector2 p = points[i];
-            bool nextIsLeft = IsLeftOrColinear(refPoint, p, points[nextI]);
-            bool prevIsLeft = IsLeftOrColinear(refPoint, p, points[prevI]);
+        if (IsLeftOrColinear(refPoint, points[0], points[n-1])
+            && !IsLeftOrColinear(refPoint, points[1], points[0]))
+        {
+            return 0;
+        }
 
-            if (p != refPoint && nextIsLeft && prevIsLeft)
+        int a = 0;
+        int b = n;
+        while (a != b)
+        {
+            int c = (a + b) / 2; // Should always be safe because we already checked 0 = n
+            int cNext = (c + 1) % n;
+            int cPrev = (c + n - 1) % n;
+
+            if (points[c] == refPoint)
             {
-                if(extraAttempts > 0)
-                {
-                    Debug.Log("Extra attempts: " + extraAttempts);
-                }
-                return i;
+                return cPrev;
             }
-            
-            if (p == refPoint)
+
+            if (points[cNext] == refPoint)
             {
-                i = (i + points.Count - n) % points.Count;
-                isForward = false;
+                return c;
             }
-            else if (isForward)
+
+            if (points[cPrev] == refPoint)
             {
-                if (nextIsLeft || !prevIsLeft)
+                return (cPrev + n - 1) % n;
+            }
+
+            bool downC = !IsLeftOrColinear(refPoint, points[cNext], points[c]);
+            if (downC && IsLeftOrColinear(refPoint, points[c], points[cPrev]))
+            {
+                return c;
+            }
+
+            int aNext = (a + 1) % n;
+            if (points[aNext] == refPoint)
+            {
+                return a;
+            }
+
+            bool upA = !IsLeftOrColinear(refPoint, points[a], points[aNext]);
+            if (upA)
+            {
+                if (downC)
                 {
-                    i = (i + points.Count - n) % points.Count;
-                    isForward = false;
+                    b = c;
                 }
                 else
                 {
-                    i = (i + n) % points.Count;
-                    isForward = true;
+                    if (!IsLeftOrColinear(refPoint, points[c], points[a]))
+                    {
+                        // a is more up than c
+                        b = c;
+                    }
+                    else
+                    {
+                        a = c;
+                    }
                 }
             }
             else
             {
-                if (prevIsLeft || !nextIsLeft)
+                if(!downC)
                 {
-                    i = (i + n) % points.Count;
-                    isForward = true;
+                    a = c;
                 }
                 else
                 {
-                    i = (i + points.Count - n) % points.Count;
-                    isForward = false;
+                    if (!IsLeftOrColinear(refPoint, points[a], points[c]))
+                    {
+                        // c is more up than a
+                        b = c;
+                    }
+                    else
+                    {
+                        a = c;
+                    }
                 }
             }
-            
-            int newN = (n + 1) / 2;
-            if (n == newN)
-            {
-                ++extraAttempts;
-            }
-
-            n = newN;
         }
+
+        throw new System.Exception("a == b in Compute tangent!");
     }
 
     /// <summary>
@@ -274,29 +309,7 @@ public class OutputSensitiveConvexHull {
     /// </summary>
     private List<int> ComputeSubHullIndicies(List<Vector2> points)
     {
-        List<Vector2> originalPoints = points.Select(x => x).ToList();
-        List<Vector2> copy = originalPoints.Select(x => x).ToList();
-        List<int> result = Algorithms.ConvexHullBasicOnVectors(copy);
-        for (int i = 0; i < result.Count; ++i)
-        {
-            Vector2 a = originalPoints[result[i]];
-            Vector2 b = originalPoints[result[(i + 1) % result.Count]];
-            for (int j = 0; j < originalPoints.Count; ++j)
-            {
-                if (!(j == result[i] || j == result[(i + 1) % result.Count]))
-                {
-                    Vector2 p = originalPoints[j];
-                    if (IsLeftOrColinear(a, b, p))
-                    {
-                        Debug.Log("Returned result is not convex!");
-                        Debug.Log("Failed on a: " + a + " b: " + b + " p: " + p);
-                        HasFailedSubhull = true;
-                        return result;
-                    }
-                }
-            }
-
-        }
+        List<int> result = Algorithms.ConvexHullBasicOnVectors(points);
         return result;
     }
 

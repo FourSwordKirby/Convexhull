@@ -24,7 +24,7 @@ public class StephenSceneScript : MonoBehaviour {
     // Use this for initialization
     void Start () {
         PointsControllerRef = GameObject.FindObjectOfType<PointsController>();
-        OutputH = 3;
+        OutputH = 16;
 	}
 
     public int Stage = 0;
@@ -74,46 +74,21 @@ public class StephenSceneScript : MonoBehaviour {
                     }
 
                     Alg.ComputeAllSubhulls();
-
-                    if (Alg.FailedSubhull >= 0)
+                    
+                    for (int subproblemIndex = 0; subproblemIndex < Alg.SubproblemPointsIndices.Count; ++subproblemIndex)
                     {
-                        foreach (Point p in PointsControllerRef.SpawnedPoints)
-                        {
-                            p.SetColor(Color.white);
-                        }
-
-                        List<int> subproblem = Alg.SubproblemPointsIndices[Alg.FailedSubhull];
-                        List<int> subhullIndices = Alg.IndiciesForSubhulls[Alg.FailedSubhull].Select(i => subproblem[i]).ToList();
-                        List<Vector2> subhull = Alg.Subhulls[Alg.FailedSubhull];
-
-                        foreach (int pointIndex in subproblem)
-                        {
-                            PointsControllerRef.SpawnedPoints[pointIndex].SetColor(Color.black);
-                            Debug.Log(PointsControllerRef.SpawnedPoints[pointIndex].transform.position);
-                        }
-
+                        List<int> subproblem = Alg.SubproblemPointsIndices[subproblemIndex];
+                        List<int> subhullIndices = Alg.IndiciesForSubhulls[subproblemIndex].Select(i => subproblem[i]).ToList();
+                        List<Vector2> subhull = Alg.Subhulls[subproblemIndex];
                         foreach (int pointIndex in subhullIndices)
                         {
-                            PointsControllerRef.SpawnedPoints[pointIndex].SetColor(Color.red);
+                            PointsControllerRef.SpawnedPoints[pointIndex].SetColor(MyColors[subproblemIndex % MyColors.Length]);
                         }
-                        PointsControllerRef.DrawShape(subhull, 0.1f, MyColors[Alg.FailedSubhull % MyColors.Length]);
+                        PointsControllerRef.DrawShape(subhull, 0.1f, MyColors[subproblemIndex % MyColors.Length]);
                     }
-                    else
-                    {
-                        for (int subproblemIndex = 0; subproblemIndex < Alg.SubproblemPointsIndices.Count; ++subproblemIndex)
-                        {
-                            List<int> subproblem = Alg.SubproblemPointsIndices[subproblemIndex];
-                            List<int> subhullIndices = Alg.IndiciesForSubhulls[subproblemIndex].Select(i => subproblem[i]).ToList();
-                            List<Vector2> subhull = Alg.Subhulls[subproblemIndex];
-                            foreach (int pointIndex in subhullIndices)
-                            {
-                                PointsControllerRef.SpawnedPoints[pointIndex].SetColor(MyColors[subproblemIndex % MyColors.Length]);
-                            }
-                            PointsControllerRef.DrawShape(subhull, 0.1f, MyColors[subproblemIndex % MyColors.Length]);
-                        }
 
-                        ++Stage;
-                    }
+                    ++Stage;
+                    
                     break;
 
                 case 2:
@@ -170,6 +145,20 @@ public class StephenSceneScript : MonoBehaviour {
 
                 default:
                     Debug.Log("No more stages left.");
+                    PointsControllerRef.ClearAllShapes();
+                    foreach (Point p in PointsControllerRef.SpawnedPoints)
+                    {
+                        p.SetColor(Color.gray);
+                        p.transform.localScale = Vector3.one;
+                    }
+
+                    foreach(int hullIndex in Alg.CompleteHull)
+                    {
+                        PointsControllerRef.SpawnedPoints[hullIndex].SetColor(Color.red);
+                        PointsControllerRef.SpawnedPoints[hullIndex].transform.localScale = 2 * Vector3.one;
+                    }
+                    PointsControllerRef.DrawShape(Alg.CompleteHull.Select(index => (Vector2)PointsControllerRef.SpawnedPoints[index].transform.position).ToList(),
+                        0.3f, Color.black);
                     break;
             }
         }

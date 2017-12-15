@@ -33,6 +33,11 @@ public class MainUI : MonoBehaviour {
         PointsControllerRef.RunRIConvexHull();
     }
 
+    public void RunOSConvexHull()
+    {
+        PointsControllerRef.RunOSConvexHull();
+    }
+
     public void ClearPoints()
     {
         PointsControllerRef.ClearAllPoints();

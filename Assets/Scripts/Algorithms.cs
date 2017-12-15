@@ -11,6 +11,8 @@ public class Algorithms
         return ConvexHullBasicOnVectors(points);
     }
 
+    public static float LastConvexHullTime = 0.0f;
+
     public static List<int> ConvexHullBasicOnVectors(List<Vector2> points)
     {
         if (points.Count < 3)
@@ -19,6 +21,10 @@ public class Algorithms
         }
 
         points = new List<Vector2>(points);
+
+        System.Diagnostics.Stopwatch watch = new System.Diagnostics.Stopwatch();
+        watch.Start();
+
         List<int> shuffledIdx = Shuffle(points);
 
         Dictionary<Vector2, int> mapping = new Dictionary<Vector2, int>();
@@ -57,6 +63,11 @@ public class Algorithms
 
                 if (Intersects(candidatePoint, interiorPoint, p1, p2))
                 {
+                    if (candidateEdgeMap.ContainsKey(candidatePoint))
+                    {
+                        continue;
+                    }
+
                     if (!buckets.ContainsKey(v))
                         buckets.Add(v, new HashSet<Vector2>());
                     buckets[v].Add(candidatePoint);
@@ -83,6 +94,12 @@ public class Algorithms
             Vertex next = v.next;
             Vertex prev = v;
             bool lineSide = true;
+
+            if (!Algorithms.Intersects(c.position, interiorPoint, prev.position, next.position))
+            {
+                //Debug.Log("Lingering candidate");
+                continue;
+            }
 
             //Marking a starting point of our hull
             hullVertex = c;
@@ -209,7 +226,10 @@ public class Algorithms
             finalHull.Add(tracer.position);
         }
 
-        return finalHull.Select(x => mapping[x]).ToList();
+        List<int> finalHullIndicies = finalHull.Select(x => mapping[x]).ToList();
+        watch.Stop();
+        LastConvexHullTime = watch.ElapsedMilliseconds / 1000f;
+        return finalHullIndicies;
     }
 
     public static List<int> Shuffle(List<Vector2> list)
@@ -264,6 +284,31 @@ public class Algorithms
     public static bool isLeft(Vector2 a, Vector2 b, Vector2 c)
     {
         return ((b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x)) >= 0.0f;
+    }
+
+    public static bool IsConvex(List<Vector2> points, List<int> hullIndices)
+    {
+        bool hasFailed = false;
+        for (int i = 0; i < hullIndices.Count; ++i)
+        {
+            int aIndex = hullIndices[i];
+            int bIndex = hullIndices[(i + 1) % hullIndices.Count];
+            Vector2 a = points[aIndex];
+            Vector2 b = points[bIndex];
+            for (int j = 0; j < points.Count; ++j)
+            {
+                if (!(j == aIndex || j == bIndex))
+                {
+                    Vector2 p = points[j];
+                    if (isLeft(a, b, p))
+                    {
+                        Debug.LogError("Hull is not convex! Failed on a: " + a + " b: " + b + " p: " + p);
+                        hasFailed = true;
+                    }
+                }
+            }
+        }
+        return !hasFailed;
     }
 }
 

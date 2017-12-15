@@ -9,6 +9,7 @@ public class PointsController : MonoBehaviour {
 
     public bool IsRecordingMouseClicks;
     public List<Point> SpawnedPoints = new List<Point>();
+    public HashSet<Vector2> PointLocations = new HashSet<Vector2>();
     public Color InputPointColor = Color.black;
     public Material ShapeOutlineMaterial;
     public Color DefaultShapeOutlineColor = Color.red;
@@ -59,10 +60,10 @@ public class PointsController : MonoBehaviour {
 
     public void SpawnRandomPoints(int count)
     {
-        Vector3 botLeft = new Vector3(0, 0, Mathf.Abs(MainCamera.transform.position.z));
+        Vector3 botLeft = new Vector3(MainCamera.pixelWidth / 10f, MainCamera.pixelHeight / 10f, Mathf.Abs(MainCamera.transform.position.z));
         Vector3 botLeftWorldLoc = MainCamera.ScreenToWorldPoint(botLeft);
 
-        Vector3 topRight = new Vector3(MainCamera.pixelWidth, MainCamera.pixelHeight, Mathf.Abs(MainCamera.transform.position.z));
+        Vector3 topRight = new Vector3(9 * MainCamera.pixelWidth / 10f, 9 * MainCamera.pixelHeight / 10f, Mathf.Abs(MainCamera.transform.position.z));
         Vector3 topRightWorldLoc = MainCamera.ScreenToWorldPoint(topRight);
 
         for (int i = 0; i < count; i++)
@@ -72,15 +73,19 @@ public class PointsController : MonoBehaviour {
             Vector2 loc = new Vector2(x, y);
             SpawnPoint(loc);
         }
-
     }
 
     public void SpawnPoint(Vector2 loc)
     {
-        Point p = Instantiate<Point>(PointPrefab, PointsContainer.transform);
-        p.transform.position = loc;
-        p.SetColor(InputPointColor);
-        SpawnedPoints.Add(p);
+        if (!PointLocations.Contains(loc))
+        {
+            PointLocations.Add(loc);
+
+            Point p = Instantiate<Point>(PointPrefab, PointsContainer.transform);
+            p.transform.position = loc;
+            p.SetColor(InputPointColor);
+            SpawnedPoints.Add(p);
+        }
     }
 
     public void SpawnPoint(Vector3 loc3d)
@@ -120,7 +125,31 @@ public class PointsController : MonoBehaviour {
 
     public void RunRIConvexHull()
     {
-        List<int> hullIndices = Algorithms.ConvexHullBasicOnVectors(SpawnedPoints.Select(p => (Vector2)p.transform.position).ToList());
+        List<Vector2> points = SpawnedPoints.Select(p => (Vector2)p.transform.position).ToList();
+        List<int> hullIndices = Algorithms.ConvexHullBasicOnVectors(points);
+        Debug.Log("Random Incremental convex hull returned in " + Algorithms.LastConvexHullTime + " seconds.");
+
+        if (!Algorithms.IsConvex(points, hullIndices))
+        {
+            Debug.LogError("RI Convex Hull returned something that isn't convex!");
+        }
+
+        List<Vector2> hull = hullIndices.Select(i => (Vector2)SpawnedPoints[i].transform.position).ToList();
+        DrawShape(hull, DefaultShapeOutlineWidth, DefaultShapeOutlineColor);
+    }
+
+    public void RunOSConvexHull()
+    {
+        List<Vector2> points = SpawnedPoints.Select(p => (Vector2)p.transform.position).ToList();
+        OutputSensitiveConvexHull osch = new OutputSensitiveConvexHull(points);
+        List<int> hullIndices = osch.ComputeConvexHullIndices();
+        Debug.Log("Output sensitive convex hull returned in " + osch.TotalTime + " seconds.");
+
+        if (!Algorithms.IsConvex(points, hullIndices))
+        {
+            Debug.LogError("OS Convex Hull returned something that isn't convex!");
+        }
+
         List<Vector2> hull = hullIndices.Select(i => (Vector2)SpawnedPoints[i].transform.position).ToList();
         DrawShape(hull, DefaultShapeOutlineWidth, DefaultShapeOutlineColor);
     }
@@ -146,6 +175,7 @@ public class PointsController : MonoBehaviour {
             Destroy(child.gameObject);
         }
         SpawnedPoints.Clear();
+        PointLocations.Clear();
     }
 
     private IEnumerator SpawnPointsCoroutine(Model m)
