@@ -96,7 +96,9 @@ public class StephenSceneScript : MonoBehaviour {
                     List<Vector2> line = new List<Vector2>() { PointsControllerRef.SpawnedPoints[LastIndex].transform.position,
                                                                PointsControllerRef.SpawnedPoints[Alg.CurrentPointIndex].transform.position };
                     PointsControllerRef.DrawShape(line, 0.3f, Color.black);
-                    
+
+                    LastIndex = Alg.CurrentPointIndex;
+
                     break;
 
                 default:

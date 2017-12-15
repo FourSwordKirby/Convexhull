@@ -59,13 +59,10 @@ public class OutputSensitiveConvexHull {
     public List<List<Vector2>> Subhulls;
     public List<int> CompleteHull;
     public int CurrentPointIndex;
-    public Vector2 CurrentPoint;
     public int HullIndex;
     public List<int> TangentIndices;
     int RightmostTangentIndex;
-    int RightmostSubhull;
     Vector2 RightmostTanget;
-    int NextHullPointIndex;
 
     public void CreateSubproblems(int h)
     {
@@ -106,7 +103,6 @@ public class OutputSensitiveConvexHull {
         Debug.Log("Begining walk along rightmost edges...");
         CompleteHull = new List<int>(H);
         CurrentPointIndex = LeftmostPointIndex;
-        CurrentPoint = InputPoints[CurrentPointIndex];
         CompleteHull.Add(CurrentPointIndex);
         HullIndex = 1;
     }
@@ -114,29 +110,30 @@ public class OutputSensitiveConvexHull {
     public bool StepWalk()
     {
         // Find the rightmost point from our current hull point.
+        Vector2 currentPoint = InputPoints[CurrentPointIndex];
         TangentIndices = new List<int>(Subhulls.Count);
-        RightmostSubhull = 0;
-        RightmostTangentIndex = ComputeTangentIndex(Subhulls[0], CurrentPoint);
+        int tangentResult = ComputeTangentIndex(Subhulls[0], currentPoint);
+        RightmostTangentIndex = SubproblemPointsIndices[0][IndiciesForSubhulls[0][tangentResult]];
         RightmostTanget = Subhulls[0][RightmostTangentIndex];
         TangentIndices.Add(SubproblemPointsIndices[0][RightmostTangentIndex]);
 
         for (int i = 1; i < Subhulls.Count; ++i)
         {
-            int tangentIndex = ComputeTangentIndex(Subhulls[i], CurrentPoint);
-            Vector2 tangent = Subhulls[i][tangentIndex];
-            TangentIndices.Add(SubproblemPointsIndices[i][tangentIndex]);
+            tangentResult = ComputeTangentIndex(Subhulls[i], currentPoint);
+            int tangentIndex = SubproblemPointsIndices[i][IndiciesForSubhulls[i][tangentResult]];
+            Vector2 tangent = Subhulls[i][tangentResult];
+            TangentIndices.Add(tangentIndex);
 
-            if (!IsLeftOrColinear(CurrentPoint, RightmostTanget, tangent))
+            if (!IsLeftOrColinear(currentPoint, RightmostTanget, tangent))
             {
-                RightmostSubhull = i;
                 RightmostTangentIndex = tangentIndex;
                 RightmostTanget = tangent;
             }
         }
 
         // Compute the index into our original list.
-        NextHullPointIndex = SubproblemPointsIndices[RightmostSubhull][RightmostTangentIndex];
-        if (NextHullPointIndex == LeftmostPointIndex)
+        int nextHullPointIndex = RightmostTangentIndex;
+        if (nextHullPointIndex == LeftmostPointIndex)
         {
             Debug.Log("Walk has reached the initial convex hull point.");
             return true;
@@ -144,8 +141,8 @@ public class OutputSensitiveConvexHull {
 
         if (HullIndex < H)
         {
-            CompleteHull.Add(NextHullPointIndex);
-            CurrentPointIndex = NextHullPointIndex;
+            CompleteHull.Add(nextHullPointIndex);
+            CurrentPointIndex = nextHullPointIndex;
         }
 
         ++HullIndex;
@@ -195,19 +192,7 @@ public class OutputSensitiveConvexHull {
                 return 1;
             }
         }
-
-        if (points.Count == 2)
-        {
-            if (IsLeftOrColinear(refPoint, points[0], points[1]))
-            {
-                return 0;
-            }
-            else
-            {
-                return 1;
-            }
-        }
-
+        
         int n = (points.Count + 1) / 2;
         int i = 0;
         bool isForward = false;
