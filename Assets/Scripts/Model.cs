@@ -19,14 +19,15 @@ public class Model : MonoBehaviour {
 		
 	}
 
-    public List<Vector3> GetVertices()
+    public List<Vector2> GetVertices()
     {
         // Mesh vertices must first be transformed by the owning Transform.
         // Then they must be transformed by this Model instance's Transform.
         return ContainedMeshFilters.SelectMany(mf => 
-            mf.mesh.vertices.Select(v =>
-                transform.TransformPoint(mf.transform.TransformPoint(v))
-            )
+            mf.mesh.vertices.Select(v => {
+                Vector3 worldSpacePoint = transform.TransformPoint(mf.transform.TransformPoint(v));
+                return new Vector2(worldSpacePoint.x, worldSpacePoint.y);
+            })
         ).ToList();
     }
 }

@@ -56,12 +56,17 @@ public class PointsController : MonoBehaviour {
         SpawnPoint(worldLoc);
     }
 
-    public void SpawnPoint(Vector3 loc)
+    public void SpawnPoint(Vector2 loc)
     {
         Point p = Instantiate<Point>(PointPrefab, PointsContainer.transform);
         p.transform.position = loc;
         p.SetColor(InputPointColor);
         SpawnedPoints.Add(p);
+    }
+
+    public void SpawnPoint(Vector3 loc3d)
+    {
+        SpawnPoint(new Vector2(loc3d.x, loc3d.y));
     }
 
     /// <summary>
@@ -102,8 +107,8 @@ public class PointsController : MonoBehaviour {
     private IEnumerator SpawnPointsCoroutine(Model m)
     {
         yield return new WaitForEndOfFrame();
-        List<Vector3> points = m.GetVertices();
-        foreach (Vector3 p in points)
+        List<Vector2> points = m.GetVertices();
+        foreach (Vector2 p in points)
         {
             SpawnPoint(p);
         }
