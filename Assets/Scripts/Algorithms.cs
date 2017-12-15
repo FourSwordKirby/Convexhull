@@ -8,12 +8,15 @@ public class Algorithms
     public static List<int> ConvexHullBasic(List<GameObject> p)
     {
         List<GameObject> copy = p.Select(x => x).ToList();
-
-        List <int> shuffledIdx = Shuffle(copy);
-        Dictionary<Vector2, int> mapping = new Dictionary<Vector2, int>();
-
-        //Copy the list
         List<Vector2> points = copy.Select(x => (Vector2)x.transform.position).ToList();
+        return ConvexHullBasicOnVectors(points);
+    }
+
+    public static List<int> ConvexHullBasicOnVectors(List<Vector2> points)
+    {
+        List<int> shuffledIdx = Shuffle(points);
+
+        Dictionary<Vector2, int> mapping = new Dictionary<Vector2, int>();
         for (int i = 0; i < points.Count; i++)
         {
             mapping.Add(points[i], shuffledIdx[i]);
@@ -42,7 +45,7 @@ public class Algorithms
         {
             Vector2 candidatePoint = points[i];
 
-            foreach(Vertex v in hull.vertices)
+            foreach (Vertex v in hull.vertices)
             {
                 Vector2 p1 = v.position;
                 Vector2 p2 = v.next.position;
@@ -59,7 +62,7 @@ public class Algorithms
 
         Vertex hullVertex = hull.vertices[0];
         List<Vector2> candidates = candidateEdgeMap.Keys.Select(x => x).ToList();
-        foreach(Vector2 candidate in candidates)
+        foreach (Vector2 candidate in candidates)
         {
             if (candidateEdgeMap[candidate] == null)
             {
@@ -96,7 +99,7 @@ public class Algorithms
                 bool intersect1 = Intersects(r, interiorPoint, v.position, c.position);
                 bool intersect2 = Intersects(r, interiorPoint, c.position, next.position);
 
-                if(!intersect1)
+                if (!intersect1)
                 {
                     buckets[v].Remove(r);
                 }
@@ -108,7 +111,7 @@ public class Algorithms
                     buckets[c].Add(r);
                     candidateEdgeMap[r] = c;
                 }
-                else if(!intersect1 && !intersect2)
+                else if (!intersect1 && !intersect2)
                 {
                     candidateEdgeMap[r] = null;
                 }
@@ -204,7 +207,7 @@ public class Algorithms
         return finalHull.Select(x => mapping[x]).ToList();
     }
 
-    static List<int> Shuffle(List<GameObject> list)
+    static List<int> Shuffle(List<Vector2> list)
     {
         System.Random rng = new System.Random();
         List<int> idxList = new List<int>();
@@ -219,7 +222,7 @@ public class Algorithms
         {
             n--;
             int k = rng.Next(n + 1);
-            GameObject value = list[k];
+            Vector2 value = list[k];
             list[k] = list[n];
             list[n] = value;
 

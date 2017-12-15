@@ -40,7 +40,6 @@ public class PointsController : MonoBehaviour {
         {
             if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject())
             {
-                Debug.Log("Click Registered.");
                 SpawnPointAtMouseLoc();
             }
         }
@@ -101,6 +100,13 @@ public class PointsController : MonoBehaviour {
         DrawShape(SpawnedPoints.Select(p => (Vector2)p.transform.position).ToList(), DefaultShapeOutlineWidth, DefaultShapeOutlineColor);
     }
 
+    public void RunRIConvexHull()
+    {
+        List<int> hullIndices = Algorithms.ConvexHullBasicOnVectors(SpawnedPoints.Select(p => (Vector2)p.transform.position).ToList());
+        List<Vector2> hull = hullIndices.Select(i => (Vector2)SpawnedPoints[i].transform.position).ToList();
+        DrawShape(hull, DefaultShapeOutlineWidth, DefaultShapeOutlineColor);
+    }
+
     public void SpawnPointsForModel(int modelIndex)
     {
         Debug.Log("Spawning points for model " + modelIndex);
@@ -114,6 +120,14 @@ public class PointsController : MonoBehaviour {
         {
             Destroy(child.gameObject);
         }
+    }
+    public void ClearAllPoints()
+    {
+        foreach (Transform child in PointsContainer.transform)
+        {
+            Destroy(child.gameObject);
+        }
+        SpawnedPoints.Clear();
     }
 
     private IEnumerator SpawnPointsCoroutine(Model m)

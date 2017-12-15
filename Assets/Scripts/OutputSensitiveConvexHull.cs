@@ -248,8 +248,6 @@ public class OutputSensitiveConvexHull {
 
             n = newN;
         }
-
-        throw new System.Exception("Unreachable code in Compute Tangent");
     }
 
     /// <summary>

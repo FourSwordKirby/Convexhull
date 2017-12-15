@@ -28,6 +28,20 @@ public class MainUI : MonoBehaviour {
         PointsControllerRef.IsRecordingMouseClicks = b;
     }
 
+    public void RunRIConvexHull()
+    {
+        PointsControllerRef.RunRIConvexHull();
+    }
+
+    public void ClearPoints()
+    {
+        PointsControllerRef.ClearAllPoints();
+    }
+
+    public void ClearShapes()
+    {
+        PointsControllerRef.ClearAllShapes();
+    }
 
     public void DrawShape()
     {
