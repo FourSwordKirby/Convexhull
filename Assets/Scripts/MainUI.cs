@@ -38,6 +38,11 @@ public class MainUI : MonoBehaviour {
         PointsControllerRef.ClearAllPoints();
     }
 
+    public void SpawnRandomPoints()
+    {
+        PointsControllerRef.SpawnRandomPoints(100);
+    }
+
     public void ClearShapes()
     {
         PointsControllerRef.ClearAllShapes();

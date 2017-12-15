@@ -57,6 +57,24 @@ public class PointsController : MonoBehaviour {
         SpawnPoint(worldLoc);
     }
 
+    public void SpawnRandomPoints(int count)
+    {
+        Vector3 botLeft = new Vector3(0, 0, Mathf.Abs(MainCamera.transform.position.z));
+        Vector3 botLeftWorldLoc = MainCamera.ScreenToWorldPoint(botLeft);
+
+        Vector3 topRight = new Vector3(MainCamera.pixelWidth, MainCamera.pixelHeight, Mathf.Abs(MainCamera.transform.position.z));
+        Vector3 topRightWorldLoc = MainCamera.ScreenToWorldPoint(topRight);
+
+        for (int i = 0; i < count; i++)
+        {
+            float x = UnityEngine.Random.Range(botLeftWorldLoc.x, topRightWorldLoc.x);
+            float y = UnityEngine.Random.Range(botLeftWorldLoc.y, topRightWorldLoc.y);
+            Vector2 loc = new Vector2(x, y);
+            SpawnPoint(loc);
+        }
+
+    }
+
     public void SpawnPoint(Vector2 loc)
     {
         Point p = Instantiate<Point>(PointPrefab, PointsContainer.transform);

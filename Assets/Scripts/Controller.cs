@@ -26,10 +26,29 @@ public class Controller : MonoBehaviour {
             points.Add(p);
         }
 
-        List<int> hull = Algorithms.ConvexHullBasic(points);
-        print(hull.Count);
+        List<int> result = Algorithms.ConvexHullBasic(points);
+        for (int i = 0; i < result.Count; ++i)
+        {
+            Vector2 a = points[result[i]].transform.position;
+            Vector2 b = points[result[(i + 1) % result.Count]].transform.position;
+            for (int j = 0; j < points.Count; ++j)
+            {
+                if (!(j == result[i] || j == result[(i + 1) % result.Count]))
+                {
+                    Vector2 p = points[j].transform.position;
+                    if (Algorithms.isLeft(a, b, p))
+                    {
+                        Debug.Log("Returned result is not convex!");
+                        Debug.Log("Failed on a: " + a + " b: " + b + " p: " + p);
+                    }
+                }
+            }
 
-        foreach (GameObject p in hull.Select(x => points[x]))
+        }
+
+        print(result.Count);
+
+        foreach (GameObject p in result.Select(x => points[x]))
         {
             p.GetComponent<Point>().DisplayColor = Color.red;
             p.GetComponent<SpriteRenderer>().sortingOrder = 10;

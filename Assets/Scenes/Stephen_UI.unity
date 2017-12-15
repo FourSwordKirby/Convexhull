@@ -727,6 +727,11 @@ Prefab:
       propertyPath: m_LocalPosition.y
       value: 270.5
       objectReference: {fileID: 0}
+    - target: {fileID: 114344351322196160, guid: 81f6dde4f07de694f8408726e657aa7b,
+        type: 2}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: SpawnRandomPoints
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 81f6dde4f07de694f8408726e657aa7b, type: 2}
   m_IsPrefabParent: 0
@@ -942,6 +947,7 @@ GameObject:
   - component: {fileID: 2147247726}
   - component: {fileID: 2147247725}
   - component: {fileID: 2147247730}
+  - component: {fileID: 2147247731}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -1033,3 +1039,14 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967295
   m_MaxRayIntersections: 0
+--- !u!114 &2147247731
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2147247724}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 34266f0cc80f8734ea4d9bc2e0e4f0c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

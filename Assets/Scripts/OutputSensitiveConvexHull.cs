@@ -66,7 +66,7 @@ public class OutputSensitiveConvexHull {
 
     public void CreateSubproblems(int h)
     {
-        Debug.Log("Creating " + h + " subproblems");
+        Debug.Log("Creating size " + h + " subproblems");
         H = h;
 
         int numSubproblems = ((InputPoints.Count - 1) / h) + 1;
@@ -84,14 +84,26 @@ public class OutputSensitiveConvexHull {
         }
     }
 
+    public bool HasFailedSubhull = false;
+    public int FailedSubhull = -1;
+
     public void ComputeAllSubhulls()
     {
+        FailedSubhull = -1;
         Debug.Log("Computing subhulls for " + SubproblemPoints.Count + " subproblems");
         IndiciesForSubhulls = new List<List<int>>(SubproblemPoints.Count);
         Subhulls = new List<List<Vector2>>(SubproblemPoints.Count);
         for (int i = 0; i < SubproblemPoints.Count; ++i)
         {
+            Debug.Log("Computing subhull problem " + i);
             List<int> subhullIndices = ComputeSubHullIndicies(SubproblemPoints[i]);
+
+            if(HasFailedSubhull)
+            {
+                FailedSubhull = i;
+                HasFailedSubhull = false;
+            }
+
             List<Vector2> subhull = subhullIndices.Select(sIndex => SubproblemPoints[i][sIndex]).ToList();
             IndiciesForSubhulls.Add(subhullIndices);
             Subhulls.Add(subhull);
@@ -114,7 +126,7 @@ public class OutputSensitiveConvexHull {
         TangentIndices = new List<int>(Subhulls.Count);
         int tangentResult = ComputeTangentIndex(Subhulls[0], currentPoint);
         RightmostTangentIndex = SubproblemPointsIndices[0][IndiciesForSubhulls[0][tangentResult]];
-        RightmostTanget = Subhulls[0][RightmostTangentIndex];
+        RightmostTanget = Subhulls[0][tangentResult];
         TangentIndices.Add(SubproblemPointsIndices[0][RightmostTangentIndex]);
 
         for (int i = 1; i < Subhulls.Count; ++i)
@@ -195,8 +207,8 @@ public class OutputSensitiveConvexHull {
         
         int n = (points.Count + 1) / 2;
         int i = 0;
-        bool isForward = false;
-        bool isLastAttempt = false;
+        bool isForward = true;
+        int extraAttempts = -1;
         while (true)
         {
             int nextI = (i + 1) % points.Count;
@@ -208,27 +220,21 @@ public class OutputSensitiveConvexHull {
 
             if (p != refPoint && nextIsLeft && prevIsLeft)
             {
+                if(extraAttempts > 0)
+                {
+                    Debug.Log("Extra attempts: " + extraAttempts);
+                }
                 return i;
             }
-
-            if (isLastAttempt)
-            {
-                throw new System.Exception("Too many iterations in compute tangent.");
-            }
-
-            if (nextIsLeft)
+            
+            if (p == refPoint)
             {
                 i = (i + points.Count - n) % points.Count;
                 isForward = false;
             }
-            else if (prevIsLeft)
+            else if (isForward)
             {
-                i = (i + n) % points.Count;
-                isForward = true;
-            }
-            else
-            {
-                if (isForward)
+                if (nextIsLeft || !prevIsLeft)
                 {
                     i = (i + points.Count - n) % points.Count;
                     isForward = false;
@@ -239,11 +245,24 @@ public class OutputSensitiveConvexHull {
                     isForward = true;
                 }
             }
-
+            else
+            {
+                if (prevIsLeft || !nextIsLeft)
+                {
+                    i = (i + n) % points.Count;
+                    isForward = true;
+                }
+                else
+                {
+                    i = (i + points.Count - n) % points.Count;
+                    isForward = false;
+                }
+            }
+            
             int newN = (n + 1) / 2;
             if (n == newN)
             {
-                isLastAttempt = true;
+                ++extraAttempts;
             }
 
             n = newN;
@@ -255,34 +274,30 @@ public class OutputSensitiveConvexHull {
     /// </summary>
     private List<int> ComputeSubHullIndicies(List<Vector2> points)
     {
-        if (points.Count > 3)
+        List<Vector2> originalPoints = points.Select(x => x).ToList();
+        List<Vector2> copy = originalPoints.Select(x => x).ToList();
+        List<int> result = Algorithms.ConvexHullBasicOnVectors(copy);
+        for (int i = 0; i < result.Count; ++i)
         {
-            throw new System.Exception("Current subhull computation cannot handle more than 3 points.");
-        }
+            Vector2 a = originalPoints[result[i]];
+            Vector2 b = originalPoints[result[(i + 1) % result.Count]];
+            for (int j = 0; j < originalPoints.Count; ++j)
+            {
+                if (!(j == result[i] || j == result[(i + 1) % result.Count]))
+                {
+                    Vector2 p = originalPoints[j];
+                    if (IsLeftOrColinear(a, b, p))
+                    {
+                        Debug.Log("Returned result is not convex!");
+                        Debug.Log("Failed on a: " + a + " b: " + b + " p: " + p);
+                        HasFailedSubhull = true;
+                        return result;
+                    }
+                }
+            }
 
-        if (points.Count == 0)
-        {
-            throw new System.Exception("Subhull problem has 0 points.");
         }
-
-        if (points.Count == 1)
-        {
-            return new List<int>() { 0 };
-        }
-
-        if (points.Count == 2)
-        {
-            return new List<int>() { 0, 1 };
-        }
-
-        if (IsLeftOrColinear(points[0], points[1], points[2]))
-        {
-            return new List<int>() { 0, 2, 1 };
-        }
-        else
-        {
-            return new List<int>() { 0, 1, 2 };
-        }
+        return result;
     }
 
     private bool IsLeftOrColinear(Vector2 a, Vector2 b, Vector2 p)

@@ -7,13 +7,18 @@ public class Algorithms
 {
     public static List<int> ConvexHullBasic(List<GameObject> p)
     {
-        List<GameObject> copy = p.Select(x => x).ToList();
-        List<Vector2> points = copy.Select(x => (Vector2)x.transform.position).ToList();
+        List<Vector2> points = p.Select(x => (Vector2)x.transform.position).ToList();
         return ConvexHullBasicOnVectors(points);
     }
 
     public static List<int> ConvexHullBasicOnVectors(List<Vector2> points)
     {
+        if (points.Count < 3)
+        {
+            return Enumerable.Range(0, points.Count).ToList();
+        }
+
+        points = new List<Vector2>(points);
         List<int> shuffledIdx = Shuffle(points);
 
         Dictionary<Vector2, int> mapping = new Dictionary<Vector2, int>();
