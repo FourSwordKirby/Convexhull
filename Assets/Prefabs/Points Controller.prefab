@@ -120,6 +120,7 @@ MonoBehaviour:
     type: 2}
   ModelPrefabs:
   - {fileID: 114795987690858640, guid: c964e842a8eadd04fad1bff35136abb1, type: 2}
+  - {fileID: 114689760935881126, guid: dead69e758b97d84bb387cd72199ca5a, type: 2}
   MainCamera: {fileID: 0}
   PointsContainer: {fileID: 0}
   ShapesContainer: {fileID: 0}

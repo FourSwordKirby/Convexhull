@@ -24,7 +24,7 @@ public class StephenSceneScript : MonoBehaviour {
     // Use this for initialization
     void Start () {
         PointsControllerRef = GameObject.FindObjectOfType<PointsController>();
-        OutputH = 16;
+        OutputH = 3;
 	}
 
     public int Stage = 0;

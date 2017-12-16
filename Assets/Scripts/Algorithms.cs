@@ -258,6 +258,8 @@ public class Algorithms
         return idxList;
     }
 
+    public static int IntersectionTests = 0;
+
     //We could replace this with a faster intersection test http://www.stefanbader.ch/faster-line-segment-intersection-for-unity3dc/
     public static bool Intersects(Vector2 p11, Vector2 p12,
                                     Vector2 p21, Vector2 p22)
@@ -278,12 +280,17 @@ public class Algorithms
         Vector4 vec = new Vector4(0.0f, 0.0f, 1.0f, 1.0f);
         Vector4 solution = myMatrix.inverse * vec;
 
+
+        IntersectionTests++;
         return solution[0] >= 0 && solution[1] >= 0 && solution[2] >= 0 && solution[3] >= 0;
     }
 
+    public static int LineSideTestCount = 0;
+
     public static bool isLeft(Vector2 a, Vector2 b, Vector2 c)
     {
-        return ((b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x)) >= 0.0f;
+        LineSideTestCount++;
+        return ((b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x)) > 0.0f;
     }
 
     public static bool IsConvex(List<Vector2> points, List<int> hullIndices)
@@ -309,6 +316,23 @@ public class Algorithms
             }
         }
         return !hasFailed;
+    }
+
+    public static float NextGaussianFloat()
+    {
+        // https://stackoverflow.com/questions/5817490/implementing-box-mueller-random-number-generator-in-c-sharp
+        float u, v, S;
+
+        do
+        {
+            u = 2.0f * UnityEngine.Random.Range(0f, 1f) - 1.0f;
+            v = 2.0f * UnityEngine.Random.Range(0f, 1f) - 1.0f;
+            S = u * u + v * v;
+        }
+        while (S >= 1.0);
+
+        float fac = Mathf.Sqrt(-2.0f * Mathf.Log(S) / S);
+        return u * fac;
     }
 }
 

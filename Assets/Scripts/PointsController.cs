@@ -60,16 +60,20 @@ public class PointsController : MonoBehaviour {
 
     public void SpawnRandomPoints(int count)
     {
+        Debug.Log("Spawning " + count + " random points");
         Vector3 botLeft = new Vector3(MainCamera.pixelWidth / 10f, MainCamera.pixelHeight / 10f, Mathf.Abs(MainCamera.transform.position.z));
         Vector3 botLeftWorldLoc = MainCamera.ScreenToWorldPoint(botLeft);
 
         Vector3 topRight = new Vector3(9 * MainCamera.pixelWidth / 10f, 9 * MainCamera.pixelHeight / 10f, Mathf.Abs(MainCamera.transform.position.z));
         Vector3 topRightWorldLoc = MainCamera.ScreenToWorldPoint(topRight);
 
+        Vector3 span = (topRightWorldLoc - botLeftWorldLoc);
+        float std = Mathf.Min(span.x / 4, span.y / 4); 
+        
         for (int i = 0; i < count; i++)
         {
-            float x = UnityEngine.Random.Range(botLeftWorldLoc.x, topRightWorldLoc.x);
-            float y = UnityEngine.Random.Range(botLeftWorldLoc.y, topRightWorldLoc.y);
+            float x = MainCamera.transform.position.x + Algorithms.NextGaussianFloat() * std;
+            float y = MainCamera.transform.position.y + Algorithms.NextGaussianFloat() * std;
             Vector2 loc = new Vector2(x, y);
             SpawnPoint(loc);
         }
@@ -126,8 +130,19 @@ public class PointsController : MonoBehaviour {
     public void RunRIConvexHull()
     {
         List<Vector2> points = SpawnedPoints.Select(p => (Vector2)p.transform.position).ToList();
+
+        Algorithms.LineSideTestCount = 0;
+        Algorithms.IntersectionTests = 0;
+
         List<int> hullIndices = Algorithms.ConvexHullBasicOnVectors(points);
         Debug.Log("Random Incremental convex hull returned in " + Algorithms.LastConvexHullTime + " seconds.");
+
+        int lstCount = Algorithms.LineSideTestCount;
+        int intCount = Algorithms.IntersectionTests;
+
+        Debug.Log("Line side tests: " + lstCount
+                  + " Intersection: " + intCount
+                  + " Total ops:" + (lstCount + intCount));
 
         if (!Algorithms.IsConvex(points, hullIndices))
         {
@@ -141,14 +156,26 @@ public class PointsController : MonoBehaviour {
     public void RunOSConvexHull()
     {
         List<Vector2> points = SpawnedPoints.Select(p => (Vector2)p.transform.position).ToList();
+
+        Algorithms.LineSideTestCount = 0;
+        Algorithms.IntersectionTests = 0;
+
         OutputSensitiveConvexHull osch = new OutputSensitiveConvexHull(points);
         List<int> hullIndices = osch.ComputeConvexHullIndices();
         Debug.Log("Output sensitive convex hull returned in " + osch.TotalTime + " seconds.");
+
+        int lstCount = Algorithms.LineSideTestCount + osch.LineSideTestCount;
+        int intCount = Algorithms.IntersectionTests;
+
+        Debug.Log("Line side tests: " + lstCount
+                  + " Intersection: " + intCount
+                  + " Total ops:" + (lstCount + intCount) );
 
         if (!Algorithms.IsConvex(points, hullIndices))
         {
             Debug.LogError("OS Convex Hull returned something that isn't convex!");
         }
+
 
         List<Vector2> hull = hullIndices.Select(i => (Vector2)SpawnedPoints[i].transform.position).ToList();
         DrawShape(hull, DefaultShapeOutlineWidth, DefaultShapeOutlineColor);
@@ -158,6 +185,8 @@ public class PointsController : MonoBehaviour {
     {
         Debug.Log("Spawning points for model " + modelIndex);
         Model m = Instantiate<Model>(ModelPrefabs[modelIndex], transform);
+        m.transform.position = (Vector2)Camera.main.transform.position;
+        m.transform.localScale = (Camera.main.orthographicSize / 10f) * Vector3.one;
         StartCoroutine(SpawnPointsCoroutine(m));
     }
 

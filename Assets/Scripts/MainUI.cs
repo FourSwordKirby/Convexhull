@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,6 +10,8 @@ public class MainUI : MonoBehaviour {
 
     private RectTransform ControlPanel;
     private Text SpawnedPointsText;
+    private InputField SpawnRandomInputField;
+    private Dropdown ModelDropdown;
 
 	// Use this for initialization
 	void Start () {
@@ -16,6 +19,9 @@ public class MainUI : MonoBehaviour {
 
         ControlPanel = transform.Find("Control Panel").GetComponent<RectTransform>();
         SpawnedPointsText = ControlPanel.Find("Spawned Points Text").GetComponent<Text>();
+        SpawnRandomInputField = ControlPanel.Find("Spawn Number").GetComponent<InputField>();
+        ModelDropdown = ControlPanel.Find("Model Dropdown").GetComponent<Dropdown>();
+        ModelDropdown.AddOptions(PointsControllerRef.ModelPrefabs.Select(p => p.Name).ToList());
 	}
 	
 	// Update is called once per frame
@@ -45,7 +51,7 @@ public class MainUI : MonoBehaviour {
 
     public void SpawnRandomPoints()
     {
-        PointsControllerRef.SpawnRandomPoints(100);
+        PointsControllerRef.SpawnRandomPoints(int.Parse(SpawnRandomInputField.text));
     }
 
     public void ClearShapes()
@@ -60,6 +66,11 @@ public class MainUI : MonoBehaviour {
 
     public void AddModel()
     {
-        PointsControllerRef.SpawnPointsForModel(0);
+        PointsControllerRef.SpawnPointsForModel(ModelDropdown.value);
+    }
+
+    public void ResetCamera()
+    {
+        Camera.main.transform.position = new Vector3(0, 0, -10);
     }
 }

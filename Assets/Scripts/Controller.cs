@@ -83,11 +83,9 @@ public class Controller : MonoBehaviour {
             {
                 Destroy(existingHull);
             }
-
-            while(ch.candidateEdgeMap.Count > 0)
-            {
-                ch.Step();
-            }
+            
+            Vector2 candidate = ch.Step();
+            
             GameObject obj = new GameObject("Hull");
 
             Debug.Log("Current hull vertices: " + ch.hull.vertices.Count);
@@ -112,7 +110,13 @@ public class Controller : MonoBehaviour {
                 pointObject.GetComponent<SpriteRenderer>().sortingOrder = 10;
             }
             PointsControllerRef.DrawShape(finalHull, 0.1f, Color.red);
-            
+
+            GameObject pointObject2 = Instantiate(point, obj.transform);
+            pointObject2.transform.position = candidate;
+            pointObject2.transform.localScale = 9 * Vector3.one;
+            pointObject2.GetComponent<Point>().DisplayColor = Color.black;
+            pointObject2.GetComponent<SpriteRenderer>().sortingOrder = 20;
+
         }
     }
 }

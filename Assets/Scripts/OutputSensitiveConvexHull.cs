@@ -49,7 +49,7 @@ public class OutputSensitiveConvexHull {
 
         ComputeLeftmostPoint();
         int restarts = 0;
-        int h = 39;
+        int h = 40;
         while (restarts <= 4)
         {
             List<int> result = ComputeConvexHullIndicesWithMaxSize(h);
@@ -57,7 +57,7 @@ public class OutputSensitiveConvexHull {
             {
                 watch.Stop();
                 TotalTime = watch.ElapsedMilliseconds / 1000f;
-                Debug.Log("Restarts required: " + restarts);
+                //Debug.Log("Restarts required: " + restarts);
                 return result;
             }
 
@@ -81,12 +81,12 @@ public class OutputSensitiveConvexHull {
 
     public void CreateSubproblems(int h)
     {
-        Debug.Log("Creating size " + h + " subproblems");
+        //Debug.Log("Creating size " + h + " subproblems");
         H = h;
 
         int numSubproblems = ((InputPoints.Count - 1) / h) + 1;
         SubproblemPointsIndices = new List<List<int>>(numSubproblems);
-        Debug.Log("Expected number of subproblems: " + numSubproblems);
+        //Debug.Log("Expected number of subproblems: " + numSubproblems);
 
         for (int subproblemIndex = 0; subproblemIndex < numSubproblems; ++subproblemIndex)
         {
@@ -102,7 +102,7 @@ public class OutputSensitiveConvexHull {
     
     public void ComputeAllSubhulls()
     {
-        Debug.Log("Computing subhulls for " + SubproblemPointsIndices.Count + " subproblems");
+        //Debug.Log("Computing subhulls for " + SubproblemPointsIndices.Count + " subproblems");
         IndiciesForSubhulls = new List<List<int>>(SubproblemPointsIndices.Count);
         Subhulls = new List<List<Vector2>>(SubproblemPointsIndices.Count);
         for (int i = 0; i < SubproblemPointsIndices.Count; ++i)
@@ -117,7 +117,7 @@ public class OutputSensitiveConvexHull {
 
     public void StartWalk()
     {
-        Debug.Log("Begining walk along rightmost edges...");
+        //Debug.Log("Begining walk along rightmost edges...");
         CompleteHull = new List<int>(H);
         CurrentPointIndex = LeftmostPointIndex;
         CompleteHull.Add(CurrentPointIndex);
@@ -152,7 +152,7 @@ public class OutputSensitiveConvexHull {
         int nextHullPointIndex = RightmostTangentIndex;
         if (nextHullPointIndex == LeftmostPointIndex)
         {
-            Debug.Log("Walk has reached the initial convex hull point.");
+            //Debug.Log("Walk has reached the initial convex hull point.");
             return true;
         }
 
@@ -168,7 +168,7 @@ public class OutputSensitiveConvexHull {
 
     public List<int> ComputeConvexHullIndicesWithMaxSize(int h)
     {
-        Debug.Log("Computing hull with max hull size of " + h);
+        //Debug.Log("Computing hull with max hull size of " + h);
         CreateSubproblems(h);
         ComputeAllSubhulls();
 
@@ -183,7 +183,7 @@ public class OutputSensitiveConvexHull {
             }
         }
 
-        Debug.Log("Failed to find convex hull with at most " + h + " points.");
+        //Debug.Log("Failed to find convex hull with at most " + h + " points.");
         return null;
     }
 
@@ -313,8 +313,12 @@ public class OutputSensitiveConvexHull {
         return result;
     }
 
+    public int LineSideTestCount = 0;
+
     private bool IsLeftOrColinear(Vector2 a, Vector2 b, Vector2 p)
     {
+        LineSideTestCount++;
+
         // cross product of (b - a) and (p - a),
         // then check if the result 3d vector has positive or negative Z.
         // 0 means p is colinear to ab.

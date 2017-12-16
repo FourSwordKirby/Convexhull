@@ -25,7 +25,7 @@ public class Model : MonoBehaviour {
         // Then they must be transformed by this Model instance's Transform.
         return ContainedMeshFilters.SelectMany(mf => 
             mf.mesh.vertices.Select(v => {
-                Vector3 worldSpacePoint = transform.TransformPoint(mf.transform.TransformPoint(v));
+                Vector3 worldSpacePoint = mf.transform.TransformPoint(v);
                 return new Vector2(worldSpacePoint.x, worldSpacePoint.y);
             })
         ).ToList();
